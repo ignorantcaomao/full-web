@@ -116,7 +116,7 @@ USE_I18N = True
 
 USE_L10N = True
 
-USE_TZ = True
+USE_TZ = False
 
 
 # Static files (CSS, JavaScript, Images)
@@ -142,8 +142,9 @@ CELERY_TIMEZONE = TIME_ZONE
 # 格式： db+scheme://user:password@host:port/dbname
 # 支持数据库django-db 和django-cache存储任务状态及结果
 # CELERY_RESULT_BACKEND = 'redis://172.16.206.203:6379/0'
-CELERY_RESULT_BACKEND = "db+mysql://root:1992@172.16.207.229/hello"
-# CELERY_RESULT_BACKEND = "django-db"
+
+# 注释掉django\db\backends\base\base.py 552行的raise
+CELERY_RESULT_BACKEND = "django-db"
 
 # celery内容等消息的格式设置，默认json
 
