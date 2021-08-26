@@ -5,6 +5,7 @@ from .tasks import add
 
 
 def async_celery(request):
+
     add.delay(3, 5)
 
     return HttpResponse('celery works')

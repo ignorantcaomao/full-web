@@ -9,12 +9,11 @@ https://docs.djangoproject.com/en/3.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.2/ref/settings/
 """
-
+import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
@@ -27,7 +26,6 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
-
 # Application definition
 
 INSTALLED_APPS = [
@@ -37,8 +35,10 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'jobs',
     'django_celery_results',
+    'django_celery_beat',
+    'jobs',
+    'taskTime',
 ]
 
 MIDDLEWARE = [
@@ -49,8 +49,13 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    # 'Hello.middleware.CustomMiddleware.LoginRequiredMiddleware',
+    # 'Hello.middleware.CustomMiddleware.LimitTimes',
+    'Hello.middleware.CustomMiddleware.TimeitMiddleware',
 ]
 
+LOGIN_URL = "/admin/login/"
+OPEN_URLS = ["/admin/"]
 ROOT_URLCONF = 'Hello.urls'
 
 TEMPLATES = [
@@ -71,18 +76,21 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'Hello.wsgi.application'
 
-
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
 DATABASES = {
+    # 'default': {
+    #     'ENGINE': 'django.db.backends.mysql',
+    #     'NAME': 'hello',
+    #     'HOST': '172.16.207.229',
+    #     'PORT': 3306,
+    #     'USER': 'root',
+    #     'PASSWORD': '1992'
+    # }
     'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'hello',
-        'HOST': '172.16.207.229',
-        'PORT': 3306,
-        'USER': 'root',
-        'PASSWORD': '1992'
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'hello.sqlite3',
     }
 }
 
@@ -104,7 +112,6 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
-
 # Internationalization
 # https://docs.djangoproject.com/en/3.2/topics/i18n/
 
@@ -117,7 +124,6 @@ USE_I18N = True
 USE_L10N = True
 
 USE_TZ = False
-
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
@@ -167,3 +173,9 @@ CELERY_WORKER_CONCURRENCY = 2
 
 # 每个worker执行了多少任务就会死掉，默认是无限的
 CELERY_WORKER_MAX_TASKS_PER_CHILD = 200
+
+# 定时任务配置
+CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
+DJANGO_CELERY_BEAT_TZ_AWARE = False
+
+

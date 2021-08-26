@@ -11,11 +11,11 @@ app = Celery('Hello')
 # 但所有Celery配置项必须以celery开头，防止冲突
 app.config_from_object('django.conf:settings', namespace='CELERY')
 
-
 # 自动从Django的已注册app中发现任务
 app.autodiscover_tasks()
 
+
 # 一个测试任务
 @app.task(bind=True)
-def debug_task(self):
-    print(f'Request: {self.requets!r}')
+def debug_task():
+    print(f'hello ！')
