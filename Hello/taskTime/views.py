@@ -1,5 +1,4 @@
 import json
-
 from django.http import JsonResponse
 from django.db import connection
 from .tasks import get_workitems, get_jszc_info
@@ -40,8 +39,5 @@ def workInfo(request):
     return JsonResponse(ret, safe=False, json_dumps_params={'ensure_ascii': False})
 
 
-def test(request):
-    # get_workitems()
-    get_jszc_info()
-    return JsonResponse('返回成功', safe=False, json_dumps_params={'ensure_ascii': False})
+
 
