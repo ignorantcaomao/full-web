@@ -6,12 +6,12 @@ from celery import Celery
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'Hello.settings')
 
 # 实例化
-app = Celery('Hello')
+app = Celery('HelloCelery')
 
 # namespace='CELERY' 作用是允许你在Django配置文件中对celery进行配置
 # 但所有Celery配置项必须以celery开头，防止冲突
 # app.config_from_object('django.conf:conf', namespace='CELERY')
-app.config_from_object('django.conf.conf', namespace='CELERY')
+app.config_from_object('Hello.conf.celeryconfig', namespace='CELERY')
 
 # 自动从Django的已注册app中发现任务
 app.autodiscover_tasks()

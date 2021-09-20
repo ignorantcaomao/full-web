@@ -35,6 +35,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django_celery_results',
+    'django_celery_beat',
+    'taskTime',
 ]
 
 MIDDLEWARE = [
@@ -74,18 +77,18 @@ WSGI_APPLICATION = 'Hello.wsgi.application'
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
 DATABASES = {
-    # 'default': {
-    #     'ENGINE': 'django.db.backends.mysql',
-    #     'NAME': 'hello',
-    #     'HOST': '172.16.207.229',
-    #     'PORT': 3306,
-    #     'USER': 'root',
-    #     'PASSWORD': '1992'
-    # }
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'hello.sqlite3',
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'hello',
+        'HOST': '127.0.0.1',
+        'PORT': 13306,
+        'USER': 'root',
+        'PASSWORD': '123456'
     }
+    # 'default': {
+    #     'ENGINE': 'django.db.backends.sqlite3',
+    #     'NAME': BASE_DIR / 'hello.sqlite3',
+    # }
 }
 
 # Password validation
@@ -128,6 +131,8 @@ STATIC_URL = '/static/'
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+DJANGO_CELERY_BEAT_TZ_AWARE = False
 
 '''
 跨域设置

@@ -1,8 +1,13 @@
+from kombu import Queue, Exchange
+
 # 最重要的配置，设置消息broker， 格式： db://user:password@host:port/dbname
 # 如果redis安装在本地，使用localhost
 # 如果docker部署的redis，使用redis：//redis:6379
 
-CELERY_BROKER_URL = 'redis://172.16.206.203:6379/0'
+# CELERY_BROKER_URL = 'redis://172.16.206.203:6379/0'
+
+
+CELERY_BROKER_URL = 'redis://127.0.0.1:16379/0'
 
 # celery时区设置
 CELERY_TIMEZONE = 'Asia/Shanghai'
@@ -22,7 +27,7 @@ CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 
 # 为任务设置超时时间，单位秒。超时即中止，执行下个任务。
-CELERY_TASK_TIME_LIMIT = 5
+CELERY_TASK_TIME_LIMIT = 300
 
 # 为存储结果设置过期日期，默认1天过期。如果beat开启，Celery每天会自动清除。
 # 设为0，存储结果永不过期
@@ -39,4 +44,12 @@ CELERY_WORKER_MAX_TASKS_PER_CHILD = 200
 
 # 定时任务配置
 CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
-DJANGO_CELERY_BEAT_TZ_AWARE = False
+CELERY_TASK_DEFAULT_QUEUE = 'default'
+CELERY_TASK_DEFAULT_ROUTING_KEY = 'default'
+CELERY_QUEUES = (
+    Queue('default', Exchange('default'), routing_key='default'),
+    Queue('heavy_tasks', Exchange('heavy_tasks'), routing_key='heavy_tasks'),
+)
+# CELERY_TASK_ROUTES = {
+#     'myapp.tasks.heave_tasks': 'heavy_tasks'
+# }

@@ -3,7 +3,7 @@ from celery import shared_task
 import requests
 import json
 import time
-from .models import workitems
+from .models import workitems, jszc_info
 
 base_url = "http://space.techstar.com.cn:8081"
 headers = {
@@ -25,10 +25,6 @@ def get_workitems():
     print('start work: get_workitems')
     datas = workitems.objects.all()
     counts = datas.count()
-    # # 获取数据库中现有的数据条数
-    # with connection.cursor() as cursor:
-    #     counts = cursor.execute("select count(*) from taskTime_workitems").fetchone()[0]
-
     result = []
     url_template = base_url + "/api/workItems?&fields=created,duration(minutes),author(name),creator(name),date,id,text,type,updated,issue(idReadable,id)" + "&$skip={}&$top=10000"
     # 拼接现在请求的url
@@ -59,21 +55,19 @@ def get_workitems():
         # 任务id号
         temp['idReadable'] = item.get('issue').get('idReadable', '')
 
-        # line = (temp['duration'], temp['created'], temp['text'], temp['author'], temp['id'], temp['idReadable'])
-        # result.append(str(line))
-        obj = workitems(id=temp['id'], text=temp['text'], author=temp['author'], idReadable=temp['idReadable'],
-                        duration=temp['duration'], created=temp['created'])
-        result.append(obj)
+        line = (temp['duration'], temp['created'], temp['text'], temp['author'], temp['id'], temp['idReadable'])
+        result.append(str(line))
 
-    # 批量插入数据
-    # result_str = ','.join(result)
+    # 批量插入去重数据
+    with connection.cursor() as cursor:
+        try:
+            cursor.execute(
+                """insert ignore into taskTime_workitems (duration, created, text, author, id, idReadable) values %s""" % ','.join(
+                    result))
+        except Exception as e:
+            print('insert failed', e)
 
-    workitems.objects.bulk_create(result)
-
-    # cursor.execute(
-    #     """insert into taskTime_workitems (duration, created, text, author, id, idReadable) values %s""" % result_str)
-    #
-    print('成功插入 %s条' % len(result))
+    print('现有数据条数', workitems.objects.all().count())
     return len(result)
 
 
@@ -82,9 +76,7 @@ def get_workitems():
 @shared_task
 def get_jszc_info():
     print('start work: get_jszc_info')
-    with connection.cursor() as cursor:
-        counts = cursor.execute("select count(*) from taskTime_jszc_info").fetchone()[0]
-        print(counts)
+    counts = jszc_info.objects.all().count()
     result = []
     url_template = base_url + "/api/admin/projects/17CJY003/issues?fields=id,idReadable,summary,created,updated,customFields(id,name,value(fullName,id,minutes,name,presentation,text))" + "&$skip={}&$top=100"
     url = url_template.format(counts)
@@ -130,14 +122,15 @@ def get_jszc_info():
 
         data_list.append(str((id, projectId, taskName, projectName, department, author, created, updated)))
 
-    result_str = ','.join(data_list)
-    cursor.execute(
-        """insert into taskTime_jszc_info (id, projectId, taskName, projectName, department, author, created, updated) values %s""" % result_str)
+    # 批量插入去重数据
+    with connection.cursor() as cursor:
+        cursor.execute(
+            """insert ignore into taskTime_jszc_info (id, projectId, taskName, projectName, department, author, created, updated) values %s""" % ','.join(
+                data_list))
 
-    print('成功插入 %s条' % len(data_list))
+    print('现有数据条数', jszc_info.objects.all().count())
     return len(data_list)
 
-
-if __name__ == '__main__':
-    get_workitems()
-    # get_jszc_info()
+# if __name__ == '__main__':
+#     get_workitems()
+#     # get_jszc_info()
