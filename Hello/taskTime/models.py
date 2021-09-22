@@ -10,6 +10,12 @@ class workitems(models.Model):
     duration = models.IntegerField(verbose_name='工作量', default=0)
     created = models.DateTimeField(verbose_name='填写日期')
 
+    def __str__(self):
+        return self.id
+
+    class Meta:
+        ordering = ['-created', 'author', 'idReadable']
+
 
 class jszc_info(models.Model):
     id = models.CharField(verbose_name='id', max_length=128, primary_key=True)
@@ -20,3 +26,9 @@ class jszc_info(models.Model):
     created = models.DateTimeField(verbose_name='创建时间')
     updated = models.DateTimeField(verbose_name='更新时间')
     projectId = models.CharField(verbose_name='任务编号', max_length=128)
+
+    def __str__(self):
+        return self.id
+
+    class Meta:
+        ordering = ['-updated', '-created', 'author']

@@ -72,7 +72,6 @@ def get_workitems():
 
 
 # 获取技术支持任务信息
-# @task
 @shared_task
 def get_jszc_info():
     print('start work: get_jszc_info')

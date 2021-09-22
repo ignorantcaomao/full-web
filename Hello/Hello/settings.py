@@ -80,10 +80,10 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'hello',
-        'HOST': '127.0.0.1',
-        'PORT': 13306,
+        'HOST': '172.16.206.203',
+        'PORT': 3306,
         'USER': 'root',
-        'PASSWORD': '123456'
+        'PASSWORD': 'vbi123456'
     }
     # 'default': {
     #     'ENGINE': 'django.db.backends.sqlite3',

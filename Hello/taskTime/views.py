@@ -1,43 +1,34 @@
-import json
-from django.http import JsonResponse
-from django.db import connection
-from .tasks import get_workitems, get_jszc_info
+from django.utils.decorators import method_decorator
+from django.views.generic import View
+from django.views.decorators.cache import cache_page
+from .models import workitems, jszc_info
+import datetime
 from django.shortcuts import render
-from .db import DbOperate
-import pandas as pd
 
 
 # Create your views here.
 
-def workInfo(request):
-    # 查询关联数据
-    sql = """select a.author, a.created, a.duration, a.text, b.projectName, b.department, b.taskName, b.projectId from taskTime_workitems a 
-                join taskTime_jszc_info b 
-                on a.idReadable = b.projectId             
-                group by  b.taskName 
-                order by a.created desc"""
+# 给整个类函数添加装饰器
+# 新增缓存装饰器
+@method_decorator(cache_page(60 * 15), name='dispatch')
+class WorkItemsView(View):
+    # 默认返回一周的数据
 
-    cursor = connection.cursor()
-    ret = cursor.execute(sql).fetchall()
+    def get(self, request):
+        # 默认取近7天的数据，如果有值，则按实际情况取数
+        days = request.GET.get('days') if request.GET.get('days') else 7
+        current = datetime.datetime.now() - datetime.timedelta(days=int(days))
+        latest_workitems = workitems.objects.filter(
+            created__gte=datetime.date(current.year, current.month, current.day))
+        return render(request, template_name='workitems.html', context={'latest_workitems': latest_workitems})
 
-    print(cursor.execute("select count(*) from taskTime_workitems").fetchone())
-    # # 读取数据
-    # with DbOperate('../hello.sqlite3') as sqlite_db:
-    #     tables = sqlite_db.execute_sql("""
-    #     select name from sqlite_master where type='table' order by name;
-    #     """)
-    #     for item in tables:
-    #         print('table: ', item)
-    #     datas = []
-    #     result = sqlite_db.execute_sql(sql)
-    #     for item in result:
-    #         datas.append(item)
-    # 生成csv文件
-    # df = pd.DataFrame(datas)
-    # df.to_csv('test.csv', index=True, header=False)
-
-    return JsonResponse(ret, safe=False, json_dumps_params={'ensure_ascii': False})
+    def post(self, request, *args, **kwargs):
+        pass
 
 
+class JszcClass(View):
 
-
+    def get(self, request):
+        current = datetime.datetime.now() + datetime.timedelta(days=-7)
+        infos = jszc_info.objects.filter(created__gte=datetime.date(current.year, current.month, current.day))
+        return render(request, context={'data': infos})

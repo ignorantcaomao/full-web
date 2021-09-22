@@ -4,10 +4,10 @@ from kombu import Queue, Exchange
 # 如果redis安装在本地，使用localhost
 # 如果docker部署的redis，使用redis：//redis:6379
 
-# CELERY_BROKER_URL = 'redis://172.16.206.203:6379/0'
+CELERY_BROKER_URL = 'redis://172.16.206.203:6379/0'
 
 
-CELERY_BROKER_URL = 'redis://127.0.0.1:16379/0'
+# CELERY_BROKER_URL = 'redis://127.0.0.1:16379/0'
 
 # celery时区设置
 CELERY_TIMEZONE = 'Asia/Shanghai'
